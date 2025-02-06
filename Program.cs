@@ -53,8 +53,7 @@ app.MapPut("/items/{id}", (ToDoDbContext db, int id, Item updatedItem) =>
     {
         return Results.NotFound(); 
     }
-
-    item.Name = updatedItem.Name; 
+    item.IsCompleted = updatedItem.IsCompleted;
     db.SaveChanges();
     return Results.Ok(item); 
 });
