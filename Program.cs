@@ -42,6 +42,7 @@ app.MapGet("/items/{id}", (ToDoDbContext context, int id) =>
 
 app.MapPost("/items", (ToDoDbContext db, Item newItem) =>
 {
+    newItem.IsCompleted = false;
     db.Items.Add(newItem);
     db.SaveChanges(); 
 });
