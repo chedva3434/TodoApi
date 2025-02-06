@@ -28,11 +28,11 @@ var app = builder.Build();
 
 
 
-app.MapGet("/Items", (ToDoDbContext db) => db.Items.ToList());
+app.MapGet("/Items", async(ToDoDbContext db) => await db.Items.ToListAsync());
 
-app.MapGet("/items/{id}", (ToDoDbContext context, int id) =>
+app.MapGet("/items/{id}", async(ToDoDbContext context, int id) =>
 {
-    var item = context.Items.FirstOrDefault(i => i.Id == id);
+    var item = await context.Items.FirstOrDefaultAsync(i => i.Id == id);
     if (item == null)
     {
         return Results.NotFound();
@@ -44,31 +44,29 @@ app.MapPost("/items", (ToDoDbContext db, Item newItem) =>
 {
     newItem.IsCompleted = false;
     db.Items.Add(newItem);
-    db.SaveChanges(); 
+    db.SaveChangesAsync(); 
 });
 
-app.MapPut("/items/{id}", (ToDoDbContext db, int id, Item updatedItem) =>
+app.MapPut("/items/{id}",async (ToDoDbContext db, int id, Item updatedItem) =>
 {
     var item = db.Items.FirstOrDefault(i => i.Id == id);
-    if (item == null)
+    if (item != null)
     {
-        return Results.NotFound(); 
-    }
-    item.IsCompleted = updatedItem.IsCompleted;
-    db.SaveChanges();
-    return Results.Ok(item); 
+        item.IsCompleted = updatedItem.IsCompleted;
+    }  
+    return await db.SaveChangesAsync();
 });
 
-app.MapDelete("/items/{id}", (ToDoDbContext db, int id) =>
+app.MapDelete("/items/{id}", async(ToDoDbContext db, int id) =>
 {
-    var item = db.Items.FirstOrDefault(i => i.Id == id);
+    var item = await db.Items.FirstOrDefaultAsync(i => i.Id == id);
     if (item == null)
     {
         return Results.NotFound();
     }
 
     db.Items.Remove(item); 
-    db.SaveChanges(); 
+    await db.SaveChangesAsync(); 
     return Results.Ok(); 
 });
 
