@@ -19,7 +19,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); 
 
 builder.Services.AddDbContext<ToDoDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("ToDoDB"),
+    options.UseMySql(builder.Configuration.GetConnectionString("bgwslqsib9wgay8d1atw"),
                      Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.33-mysql")));
 
 builder.Services.AddDbContext<ToDoDbContext>();
@@ -27,9 +27,8 @@ builder.Services.AddDbContext<ToDoDbContext>();
 var app = builder.Build();
 
 
-app.UseCors("AllowAll");
 
-app.MapGet("/items", (ToDoDbContext db) => db.Items.ToList());
+app.MapGet("/Items", (ToDoDbContext db) => db.Items.ToList());
 
 app.MapGet("/items/{id}", (ToDoDbContext context, int id) =>
 {
@@ -45,7 +44,6 @@ app.MapPost("/items", (ToDoDbContext db, Item newItem) =>
 {
     db.Items.Add(newItem);
     db.SaveChanges(); 
-    return Results.Created($"/items/{newItem.Id}", newItem);
 });
 
 app.MapPut("/items/{id}", (ToDoDbContext db, int id, Item updatedItem) =>
@@ -85,5 +83,6 @@ app.UseSwaggerUI(c =>
 //}
 
 app.MapGet("/", () => "TodoApi Api is running!");
+app.UseCors("AllowAll");
 
 app.Run();

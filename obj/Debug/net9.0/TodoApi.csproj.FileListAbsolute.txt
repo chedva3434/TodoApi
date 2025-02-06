@@ -142,3 +142,4 @@ C:\Users\user1\Documents\חדוה תכנות\שנה ב\פרקטיקוד\TodoApi\
 C:\Users\user1\Documents\חדוה תכנות\שנה ב\פרקטיקוד\TodoApi\bin\Debug\net9.0\package-lock.json
 C:\Users\user1\Documents\חדוה תכנות\שנה ב\פרקטיקוד\TodoApi\bin\Debug\net9.0\package.json
 C:\Users\user1\Documents\חדוה תכנות\שנה ב\פרקטיקוד\TodoApi\obj\Debug\net9.0\TodoApi.sourcelink.json
+C:\Users\user1\Documents\חדוה תכנות\שנה ב\פרקטיקוד\TodoApi\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
