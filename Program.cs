@@ -15,6 +15,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
 builder.Services.AddEndpointsApiExplorer();  
 builder.Services.AddSwaggerGen(); 
 
@@ -22,15 +24,23 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("bgwslqsib9wgay8d1atw"),
                      Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.33-mysql")));
 
-builder.Services.AddDbContext<ToDoDbContext>();
 
 var app = builder.Build();
 
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+    c.RoutePrefix = string.Empty;
+});
+//}
 
 
-app.MapGet("/Items", async(ToDoDbContext db) => await db.Items.ToListAsync());
+app.MapGet("/Items", async (ToDoDbContext db) => { return await db.Items.ToListAsync(); });
 
-app.MapGet("/items/{id}", async(ToDoDbContext context, int id) =>
+app.MapGet("/Items/{id}", async(ToDoDbContext context, int id) =>
 {
     var item = await context.Items.FirstOrDefaultAsync(i => i.Id == id);
     if (item == null)
@@ -40,11 +50,11 @@ app.MapGet("/items/{id}", async(ToDoDbContext context, int id) =>
     return Results.Ok(item); 
 });
 
-app.MapPost("/items", (ToDoDbContext db, Item newItem) =>
-{
+app.MapPost("/Items", async (ToDoDbContext db, Item newItem) =>
+{ 
     newItem.IsCompleted = false;
     db.Items.Add(newItem);
-    db.SaveChangesAsync(); 
+    await db.SaveChangesAsync(); 
 });
 
 app.MapPut("/items/{id}",async (ToDoDbContext db, int id, Item updatedItem) =>
@@ -70,15 +80,6 @@ app.MapDelete("/items/{id}", async(ToDoDbContext db, int id) =>
     return Results.Ok(); 
 });
 
-//if (app.Environment.IsDevelopment())
-//{
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-    c.RoutePrefix = string.Empty;
-});
-//}
 
 app.MapGet("/", () => "TodoApi Api is running!");
 app.UseCors("AllowAll");
