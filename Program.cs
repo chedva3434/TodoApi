@@ -57,24 +57,15 @@ app.MapPost("/Items", async (ToDoDbContext db, Item newItem) =>
     await db.SaveChangesAsync(); 
 });
 
-app.MapPut("/items/{id}", async (ToDoDbContext db, int id, Item updatedItem) =>
+app.MapPut("/items/{id}", async (int id, Item item, ToDoDbContext Db) =>
 {
-    var item = await db.Items.FirstOrDefaultAsync(i => i.Id == id);
-    if (item != null)
+    var itemToUpdate = await Db.Items.FirstOrDefaultAsync(a => a.Id == id);
+    if (itemToUpdate != null)
     {
-        // עדכון רק אם נשלח ערך חדש
-        if (updatedItem.IsCompleted != null)
-        {
-            item.IsCompleted = updatedItem.IsCompleted;
-        }
-        await db.SaveChangesAsync();
-        return Results.Ok(item);  // מחזיר את המשימה המעודכנת
+        itemToUpdate.IsCompleted = item.IsCompleted;
     }
-    return Results.NotFound();  // אם לא נמצא פריט
+    await Db.SaveChangesAsync();
 });
-
-
-
 
 app.MapDelete("/items/{id}", async(ToDoDbContext db, int id) =>
 {
