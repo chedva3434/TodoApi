@@ -57,15 +57,25 @@ app.MapPost("/Items", async (ToDoDbContext db, Item newItem) =>
     await db.SaveChangesAsync(); 
 });
 
-app.MapPut("/items/{id}",async (ToDoDbContext db, int id, Item updatedItem) =>
+app.MapPut("/items/{id}", async (ToDoDbContext db, int id, Item updatedItem) =>
 {
     var item = db.Items.FirstOrDefault(i => i.Id == id);
     if (item != null)
     {
-        item.IsCompleted = updatedItem.IsCompleted;
-    }  
-    return await db.SaveChangesAsync();
+        if (updatedItem.IsCompleted != null)
+        {
+            item.IsCompleted = updatedItem.IsCompleted;
+        }
+    }
+    else
+    {
+        return Results.NotFound();
+    }
+
+    await db.SaveChangesAsync();
+    return Results.Ok(item); 
 });
+
 
 app.MapDelete("/items/{id}", async(ToDoDbContext db, int id) =>
 {
