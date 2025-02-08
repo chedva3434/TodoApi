@@ -1,6 +1,8 @@
 using TodoApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,15 +59,23 @@ app.MapPost("/Items", async (ToDoDbContext db, Item newItem) =>
     await db.SaveChangesAsync(); 
 });
 
-app.MapPut("/items/{id}", async (int id, Item item, ToDoDbContext Db) =>
+app.MapPut("/items/{id}", async (ToDoDbContext db, int id, Item updatedItem) =>
 {
-    var itemToUpdate = await Db.Items.FirstOrDefaultAsync(a => a.Id == id);
-    if (itemToUpdate != null)
+    Console.WriteLine("Received updatedItem: " + JsonConvert.SerializeObject(updatedItem));  // הדפסת הנתונים
+    var item = await db.Items.FirstOrDefaultAsync(i => i.Id == id);
+    if (item != null)
     {
-        itemToUpdate.IsCompleted = item.IsCompleted;
+        // אם יש ערך, עדכן אותו
+        if (updatedItem.IsCompleted.HasValue)
+        {
+            item.IsCompleted = updatedItem.IsCompleted.Value;
+        }
+        await db.SaveChangesAsync();
+        return Results.Ok(item);
     }
-    await Db.SaveChangesAsync();
+    return Results.NotFound();
 });
+
 
 app.MapDelete("/items/{id}", async(ToDoDbContext db, int id) =>
 {
