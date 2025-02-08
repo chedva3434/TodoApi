@@ -1,8 +1,7 @@
 using TodoApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-
+using Microsoft.AspNetCore.Mvc;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +17,6 @@ builder.Services.AddCors(options =>
 });
 
 
-
 builder.Services.AddEndpointsApiExplorer();  
 builder.Services.AddSwaggerGen(); 
 
@@ -30,15 +28,14 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
-//{
+{
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
     c.RoutePrefix = string.Empty;
 });
-//}
-
+}
 
 app.MapGet("/Items", async (ToDoDbContext db) => { return await db.Items.ToListAsync(); });
 
@@ -59,9 +56,10 @@ app.MapPost("/Items", async (ToDoDbContext db, Item newItem) =>
     await db.SaveChangesAsync(); 
 });
 
-app.MapPut("/items/{id}", async (int id, Item item, ToDoDbContext Db) =>
+app.MapPut("/Items/{id}", async (int id, [FromBody]Item item, ToDoDbContext Db) =>
 {
     var itemToUpdate = await Db.Items.FirstOrDefaultAsync(a => a.Id == id);
+    Console.WriteLine(item);
     if (itemToUpdate != null)
     {
         itemToUpdate.IsCompleted = item.IsCompleted;
@@ -70,7 +68,7 @@ app.MapPut("/items/{id}", async (int id, Item item, ToDoDbContext Db) =>
 });
 
 
-app.MapDelete("/items/{id}", async(ToDoDbContext db, int id) =>
+app.MapDelete("/Items/{id}", async(ToDoDbContext db, int id) =>
 {
     var item = await db.Items.FirstOrDefaultAsync(i => i.Id == id);
     if (item == null)
