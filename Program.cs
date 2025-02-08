@@ -59,21 +59,14 @@ app.MapPost("/Items", async (ToDoDbContext db, Item newItem) =>
     await db.SaveChangesAsync(); 
 });
 
-app.MapPut("/items/{id}", async (ToDoDbContext db, int id, Item updatedItem) =>
+app.MapPut("/items/{id}", async (int id, Item item, ToDoDbContext Db) =>
 {
-    Console.WriteLine("Received updatedItem: " + JsonConvert.SerializeObject(updatedItem));  // הדפסת הנתונים
-    var item = await db.Items.FirstOrDefaultAsync(i => i.Id == id);
-    if (item != null)
+    var itemToUpdate = await Db.Items.FirstOrDefaultAsync(a => a.Id == id);
+    if (itemToUpdate != null)
     {
-        // אם יש ערך, עדכן אותו
-        if (updatedItem.IsCompleted.HasValue)
-        {
-            item.IsCompleted = updatedItem.IsCompleted.Value;
-        }
-        await db.SaveChangesAsync();
-        return Results.Ok(item);
+        itemToUpdate.IsCompleted = item.IsCompleted;
     }
-    return Results.NotFound();
+    await Db.SaveChangesAsync();
 });
 
 
